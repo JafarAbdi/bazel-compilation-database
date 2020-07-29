@@ -126,7 +126,7 @@ else
   sed -i.bak -e "s|__EXEC_ROOT__|${EXEC_ROOT}|" "${COMPDB_FILE}"  # Replace exec_root marker
   # This is for YCM to help find the DB when following generated files.
   # The file may be deleted by bazel on the next build.
-  ln -f -s "${WORKSPACE}/${COMPDB_FILE}" "${EXEC_ROOT}/"
+  ln -f -s "${COMPDB_FILE}" "${EXEC_ROOT}/"
 fi
 sed -i.bak -e "s|-isysroot __BAZEL_XCODE_SDKROOT__||" "${COMPDB_FILE}"  # Replace -isysroot __BAZEL_XCODE_SDKROOT__ marker
 

@@ -82,6 +82,19 @@ def _sources(target, ctx):
 
     return srcs
 
+def _uniq(l):
+    return {k:1 for k in l}.keys()
+
+def _replace_virtual_includes(include_directories):
+    # Directory depth to files under bazel-out
+    BAZEL_OUT_PREFIX_DEPTH = 3
+    results = []
+    for t in include_directories:
+        if t.find("/_virtual_includes/") >= 0:
+            include_dir = "/".join(t.split("/_virtual_includes")[0].split("/")[BAZEL_OUT_PREFIX_DEPTH:])
+            results.append(include_dir)
+    return _uniq(results)
+
 # Function copied from https://gist.github.com/oquenchil/7e2c2bd761aa1341b458cc25608da50c
 def get_compile_flags(dep):
     options = []
@@ -93,12 +106,14 @@ def get_compile_flags(dep):
         if len(system_include) == 0:
             system_include = "."
         options.append("-isystem {}".format(system_include))
-
-    for include in compilation_context.includes.to_list():
+    include_directories = _replace_virtual_includes(compilation_context.includes.to_list())
+    for include in include_directories:
         if len(include) == 0:
             include = "."
         options.append("-I {}".format(include))
-
+    options.append("-I {}".format("/home/jafar_abdi/workspaces"))
+    options.append("-I {}".format("/opt/drake/include/drake_lcmtypes"))
+    options.append("-I {}".format("/opt/drake/include"))
     for quote_include in compilation_context.quote_includes.to_list():
         if len(quote_include) == 0:
             quote_include = "."
